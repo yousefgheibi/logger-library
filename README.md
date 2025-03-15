@@ -1,27 +1,108 @@
-# LoggerLibrary
+# Creating an Angular Library
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 16.2.16.
+This guide walks you through the process of creating an Angular library step by step.
 
-## Development server
+## Prerequisites
+- Install [Node.js](https://nodejs.org/)
+- Install Angular CLI globally (if not installed):
+  ```sh
+  npm install -g @angular/cli
+  ```
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+## Step 1: Create an Angular Workspace
+Create a new Angular workspace (or use an existing one):
+```sh
+ng new angular-library-demo --create-application=false
+cd angular-library-demo
+```
 
-## Code scaffolding
+## Step 2: Generate a New Library
+Run the following command to generate an Angular library:
+```sh
+ng generate library logger
+```
+This creates a new folder `projects/logger` inside the workspace.
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+## Step 3: Implement the Library
+Navigate to the `projects/logger/src/lib` directory and create a `logger.service.ts` file:
+```typescript
+import { Injectable } from '@angular/core';
 
-## Build
+@Injectable({
+  providedIn: 'root',
+})
+export class LoggerService {
+  log(message: string): void {
+    console.log(message);
+  }
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+  error(message: string): void {
+    console.error(message);
+  }
 
-## Running unit tests
+  warn(message: string): void {
+    console.warn(message);
+  }
+}
+```
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+### Step 4: Create a Module (Optional)
+If you want to package the service inside a module, create `logger.module.ts`:
+```typescript
+import { NgModule } from '@angular/core';
+import { LoggerService } from './logger.service';
 
-## Running end-to-end tests
+@NgModule({
+  providers: [LoggerService],
+})
+export class LoggerModule {}
+```
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+## Step 5: Export Public API
+Modify `projects/logger/src/public-api.ts` to include:
+```typescript
+export * from './lib/logger.service';
+export * from './lib/logger.module';
+```
 
-## Further help
+## Step 6: Build the Library
+Run the following command to build the library:
+```sh
+ng build logger
+```
+This generates the output inside the `dist/logger` folder.
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+## Step 7: Use the Library Locally
+In a separate Angular project, install the library locally:
+```sh
+npm install ../dist/logger
+```
+Import and use it in an Angular component:
+```typescript
+import { Component } from '@angular/core';
+import { LoggerService } from 'logger';
+
+@Component({
+  selector: 'app-root',
+  template: `<h1>Logger Example</h1>`
+})
+export class AppComponent {
+  constructor(private logger: LoggerService) {
+    this.logger.log('Logger is working!');
+  }
+}
+```
+
+## Step 8: Publish to NPM (Optional)
+1. Login to NPM:
+   ```sh
+   npm login
+   ```
+2. Publish the library:
+   ```sh
+   npm publish dist/logger --access public
+   ```
+
+## Conclusion
+You have successfully created and used an Angular library! 🎉
+
